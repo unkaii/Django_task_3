@@ -1,0 +1,49 @@
+{% extends 'myapp/base.html' %}
+{% block title %}Главная — Успеваемость{% endblock %}
+
+{% block content %}
+<h1>Ввод данных об успеваемости</h1>
+<p class="subtitle">Заполните форму — данные сохранятся в файл JSON или XML</p>
+
+<div class="card">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">💾 Сохранить в файл</button>
+  </form>
+</div>
+
+<h2>Файлы данных</h2>
+
+{% if files %}
+  <table>
+    <thead>
+      <tr>
+        <th>Имя файла</th>
+        <th>Раздел</th>
+        <th>Размер</th>
+        <th>Изменён</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in files %}
+        <tr>
+          <td><strong>{{ f.name }}</strong></td>
+          <td>
+            {% if f.folder == 'data' %}📝 Созданные{% else %}📤 Загруженные{% endif %}
+          </td>
+          <td>{{ f.size }} Б</td>
+          <td>{{ f.mtime|date:"d.m.Y H:i:s" }}</td>
+          <td><a href="{% url 'file_detail' f.folder f.name %}">Открыть →</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="empty-state">
+    <div class="icon">📭</div>
+    <p>Пока ни одного файла с данными не найдено. Добавьте первую запись через форму выше.</p>
+  </div>
+{% endif %}
+{% endblock %}

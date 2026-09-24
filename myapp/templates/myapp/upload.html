@@ -1,0 +1,12 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+<h1>Загрузка файла JSON/XML</h1>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Загрузить</button>
+</form>
+
+<p><a href="{% url 'index' %}">← На главную</a></p>
+{% endblock %}
