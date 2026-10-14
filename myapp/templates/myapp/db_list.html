@@ -1,0 +1,112 @@
+{% extends 'myapp/base.html' %}
+{% block title %}База данных{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Записи в базе данных</h1>
+
+<div class="input-group mb-3">
+  <span class="input-group-text"><i class="bi bi-search"></i></span>
+  <input type="text" id="search-input" class="form-control"
+         placeholder="Поиск по ФИО или предмету...">
+  <button class="btn btn-outline-secondary" type="button" id="clear-btn">Очистить</button>
+</div>
+
+<p class="text-muted">Найдено: <span id="result-count">{{ total }}</span></p>
+
+<div class="table-responsive">
+  <table class="table table-hover align-middle" id="db-table">
+    <thead class="table-light">
+      <tr>
+        <th>#</th><th>Студент</th><th>Предмет</th><th>Оценка</th><th>Дата</th>
+        <th class="text-end">Действия</th>
+      </tr>
+    </thead>
+    <tbody id="db-tbody">
+      {% for r in records %}
+        <tr data-id="{{ r.id }}">
+          <td>{{ forloop.counter }}</td>
+          <td>{{ r.student }}</td>
+          <td>{{ r.subject }}</td>
+          <td><span class="grade-badge grade-{{ r.grade }}">{{ r.grade }}</span></td>
+          <td>{{ r.date|date:"d.m.Y" }}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-primary"
+               href="{% url 'db_edit' r.pk %}">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <a class="btn btn-sm btn-outline-danger"
+               href="{% url 'db_delete' r.pk %}">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr id="empty-row"><td colspan="6" class="text-center text-muted">
+          Записей пока нет
+        </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const searchInput = document.getElementById('search-input');
+const tbody = document.getElementById('db-tbody');
+const countSpan = document.getElementById('result-count');
+let timer = null;
+
+function renderRows(rows) {
+  tbody.innerHTML = '';
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' +
+                      'Ничего не найдено</td></tr>';
+    return;
+  }
+  rows.forEach((r, i) => {
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${escapeHtml(r.student)}</td>
+        <td>${escapeHtml(r.subject)}</td>
+        <td><span class="grade-badge grade-${r.grade}">${r.grade}</span></td>
+        <td>${r.date}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-primary" href="/db/${r.id}/edit/">
+            <i class="bi bi-pencil"></i>
+          </a>
+          <a class="btn btn-sm btn-outline-danger" href="/db/${r.id}/delete/">
+            <i class="bi bi-trash"></i>
+          </a>
+        </td>
+      </tr>`);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+async function doSearch() {
+  const q = searchInput.value.trim();
+  const res = await fetch(`/db/search/?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+  countSpan.textContent = data.count;
+  renderRows(data.results);
+}
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(timer);
+  timer = setTimeout(doSearch, 300);
+});
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  searchInput.value = '';
+  doSearch();
+});
+</script>
+{% endblock %}

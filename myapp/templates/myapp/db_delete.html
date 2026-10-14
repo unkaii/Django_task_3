@@ -1,0 +1,21 @@
+{% extends 'myapp/base.html' %}
+{% block title %}Удаление{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Удалить запись?</h1>
+
+<div class="card p-4">
+  <p><strong>Студент:</strong> {{ grade.student }}</p>
+  <p><strong>Предмет:</strong> {{ grade.subject }}</p>
+  <p><strong>Оценка:</strong> {{ grade.grade }}</p>
+  <p><strong>Дата:</strong> {{ grade.date|date:"d.m.Y" }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">
+      <i class="bi bi-trash"></i> Удалить
+    </button>
+    <a class="btn btn-secondary" href="{% url 'db_list' %}">Отмена</a>
+  </form>
+</div>
+{% endblock %}
