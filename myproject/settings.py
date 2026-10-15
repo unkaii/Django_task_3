@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-j@rqjgo9+yy80hpvje##yk(c!96z!y+s!sdfv57$%v=0h3x0m-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['django-3.de1.netrun.io']
 
 
 # Application definition
