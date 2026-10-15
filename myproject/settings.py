@@ -134,3 +134,6 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
+CSRF_TRUSTED_ORIGINS = [
+    'https://django-3.de1.netrun.io',
+]
